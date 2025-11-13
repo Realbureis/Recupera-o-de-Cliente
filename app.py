@@ -1,7 +1,9 @@
 import streamlit as st
 import pandas as pd
 from urllib.parse import quote
-from datetime import datetime, timedelta # Importação correta do módulo datetime
+# CORREÇÃO: Importa o módulo 'datetime' principal para resolver o AttributeError
+import datetime 
+from datetime import timedelta
 import io
 
 # --- Configurações da Aplicação ---
@@ -29,8 +31,6 @@ COL_OUT_MSG = 'Mensagem_Personalizada'
 def process_data_inativos(df_input):
     """
     Filtra clientes que tiveram a ÚLTIMA atividade (qualquer status) há 30 dias ou mais.
-    
-    Lógica de Exclusão Estrita: Se houver qualquer pedido com data recente (menos de 30 dias), o cliente é excluído.
     """
     df = df_input.copy() 
     
@@ -54,8 +54,8 @@ def process_data_inativos(df_input):
     
     df.dropna(subset=[COL_DATE], inplace=True)
     
-    # --- CORREÇÃO DO ATTRIBUTE ERROR ---
-    today = datetime.now().normalize()
+    # --- CORREÇÃO DO ATTRIBUTE ERROR (Linha 58) ---
+    today = datetime.datetime.now().normalize()
     date_30_days_ago = today - timedelta(days=30)
     # -----------------------------------
     
@@ -157,6 +157,7 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file is not None:
+    # ... (Resto do código da interface permanece o mesmo) ...
     try:
         if uploaded_file.name.endswith('.csv'):
             df_original = pd.read_csv(uploaded_file)
@@ -251,7 +252,7 @@ if uploaded_file is not None:
             st.markdown("---")
 
             # Botão de Download
-            df_export = df_processed[[COL_ID, COL_NAME, COL_PHONE, COL_STATUS, COL_ORDER_ID, COL_DATE, COL_TOTAL_VALUE, 'Data_Referencia', COL_OUT_MSG]].copy()
+            df_export = df_processed[[COL_ID, COL_NAME, COL_PHONE, COL_STATUS, COL_ORDER_ID, COL_TOTAL_VALUE, 'Data_Referencia', COL_OUT_MSG]].copy()
             df_export.rename(columns={COL_DATE: 'Data_Pedido_Referencia', 'Data_Referencia': 'Ultima_Atividade_no_Filtro'}, inplace=True)
             
             # Formata para CSV
