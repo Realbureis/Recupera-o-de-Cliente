@@ -1,14 +1,14 @@
 import streamlit as st
 import pandas as pd
 from urllib.parse import quote
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta # Importação correta do módulo datetime
 import io
 
 # --- Configurações da Aplicação ---
 st.set_page_config(layout="wide", page_title="Processador de Clientes Inativos (Reengajamento)")
 
 st.title("🎯 Qualificação para Reengajamento (Clientes Inativos)")
-st.markdown("Filtra clientes cuja **última atividade geral** (qualquer status) foi **há 30 dias ou mais**.")
+st.markdown("Filtra clientes cuja **última atividade geral** foi **há 30 dias ou mais**.")
 
 # --- Definição das Colunas ---
 COL_ID = 'Codigo Cliente'
@@ -48,15 +48,16 @@ def process_data_inativos(df_input):
     
     # 2. Conversão da Data
     try:
-        # Usamos dayfirst=True para tratar formatos como DD/MM/AAAA
         df[COL_DATE] = pd.to_datetime(df[COL_DATE], errors='coerce', dayfirst=True).dt.normalize()
     except Exception as e:
         raise ValueError(f"Erro ao converter a coluna '{COL_DATE}' para data. Erro: {e}")
     
     df.dropna(subset=[COL_DATE], inplace=True)
     
+    # --- CORREÇÃO DO ATTRIBUTE ERROR ---
     today = datetime.now().normalize()
     date_30_days_ago = today - timedelta(days=30)
+    # -----------------------------------
     
     # 3. Lógica Rigorosa de Inatividade (Exclusão Estrita)
     
@@ -65,7 +66,6 @@ def process_data_inativos(df_input):
     df_last_activity.rename(columns={COL_DATE: 'Ultima_Atividade_Geral'}, inplace=True)
 
     # B. Filtra: A última atividade geral DEVE ser de 30 dias atrás ou mais.
-    # Qualquer cliente com atividade MAIS RECENTE que 30 dias é EXCLUÍDO.
     clientes_inativos_ids = df_last_activity[
         df_last_activity['Ultima_Atividade_Geral'] <= date_30_days_ago
     ][COL_ID].unique()
@@ -74,9 +74,6 @@ def process_data_inativos(df_input):
     df_qualified = df[df[COL_ID].isin(clientes_inativos_ids)].copy()
     
     # 4. Seleção Final para Mensagem
-    
-    # Dos clientes inativos, queremos apenas um pedido para referência na mensagem.
-    # Priorizamos o último pedido 'Enviado' (se houver), ou o mais recente (se não houver 'Enviado' no histórico)
     
     # Primeiro, tenta pegar o último pedido 'Enviado'
     df_enviados = df_qualified[df_qualified[COL_STATUS] == 'Enviado'].copy()
