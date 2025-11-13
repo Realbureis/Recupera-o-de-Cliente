@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
 from urllib.parse import quote
-# CORREÇÃO: Importa o módulo 'datetime' principal para resolver o AttributeError
-import datetime 
+import datetime as dt # CORREÇÃO: Importa o módulo como 'dt' para evitar conflito
 from datetime import timedelta
 import io
 
@@ -55,7 +54,7 @@ def process_data_inativos(df_input):
     df.dropna(subset=[COL_DATE], inplace=True)
     
     # --- CORREÇÃO DO ATTRIBUTE ERROR (Linha 58) ---
-    today = datetime.datetime.now().normalize()
+    today = dt.datetime.now().normalize()
     date_30_days_ago = today - timedelta(days=30)
     # -----------------------------------
     
