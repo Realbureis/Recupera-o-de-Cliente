@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from urllib.parse import quote
-# CORREÇÃO FINAL: Usamos date e timedelta, a forma mais estável de importar data no Streamlit
 from datetime import date, timedelta 
 import datetime 
 import io
@@ -39,9 +38,11 @@ def get_gender_parts(first_name):
     lower_name = first_name.lower()
     
     if lower_name in FEMININE_NAMES or (lower_name.endswith('a') and len(lower_name) > 2):
-        return {'pronoun': 'ela', 'preposition': 'da', 'article': 'a'}
+        # Chaves em Português
+        return {'pronome': 'ela', 'preposicao': 'da', 'artigo_definido': 'a'}
     
-    return {'pronome': 'ele', 'preposition': 'do', 'article': 'o'}
+    # Chaves em Português (Fallback Masculino)
+    return {'pronome': 'ele', 'preposicao': 'do', 'artigo_definido': 'o'}
 
 
 # --- Função de Lógica de Negócio (O Cérebro) ---
@@ -74,7 +75,7 @@ def process_data_inativos(df_input):
     
     df.dropna(subset=[COL_DATE], inplace=True)
     
-    # --- CÁLCULO DE INATIVIDADE (CORREÇÃO DE DATA/TEMPO) ---
+    # --- CÁLCULO DE INATIVIDADE ---
     today = date.today() 
     date_28_days_ago = today - timedelta(days=28)
     # -----------------------------------
@@ -144,9 +145,10 @@ def process_data_inativos(df_input):
             detento_first_name = str(detento_full_name).strip().split(' ')[0]
             detento_first_name = detento_first_name.capitalize()
             
+            # CHAVES CORRIGIDAS: Agora usa 'pronome' e 'artigo_definido'
             gender_parts = get_gender_parts(detento_first_name) 
-            pronome = gender_parts['pronoun']
-            artigo_definido = gender_parts['article'] 
+            pronome = gender_parts['pronome']
+            artigo_definido = gender_parts['artigo_definido'] 
 
         # --- TEMPLATE DE MENSAGEM FINAL (COM ARTIGO DEFINIDO CORRIGIDO) ---
         message = (
