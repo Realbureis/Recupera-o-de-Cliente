@@ -149,7 +149,7 @@ def process_data_inativos(df_input):
 
         # --- TEMPLATE DE MENSAGEM FINAL (COM ARTIGO DEFINIDO E CREDIBILIDADE) ---
         message = (
-            f"Olá {client_first_name}! Aqui é o Victor, consultor da Jumbo CDP! \n"
+            f"Olá {client_first_name}! Aqui é a Sofia, sua consultora da Jumbo CDP! \n"
             f"Tenho uma ótima notícia para você.\n\n"
             f"Percebemos que o seu último jumbo para {artigo_definido} {detento_first_name} foi em {last_order_date}. {pronome.capitalize()} pode estar a precisar de alguns produtos! \n\n"
             f"E para tornar a sua próxima compra ainda melhor, consegui garantir um *BRINDE EXCLUSIVO* para incluir no pedido d{artigo_definido} {detento_first_name}.\n\n"
