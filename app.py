@@ -38,11 +38,9 @@ def get_gender_parts(first_name):
     lower_name = first_name.lower()
     
     if lower_name in FEMININE_NAMES or (lower_name.endswith('a') and len(lower_name) > 2):
-        # Chaves em Português
-        return {'pronome': 'ela', 'preposicao': 'da', 'artigo_definido': 'a'}
+        return {'pronome': 'ela', 'preposition': 'da', 'article': 'a'}
     
-    # Chaves em Português (Fallback Masculino)
-    return {'pronome': 'ele', 'preposicao': 'do', 'artigo_definido': 'o'}
+    return {'pronome': 'ele', 'preposition': 'do', 'article': 'o'}
 
 
 # --- Função de Lógica de Negócio (O Cérebro) ---
@@ -145,18 +143,17 @@ def process_data_inativos(df_input):
             detento_first_name = str(detento_full_name).strip().split(' ')[0]
             detento_first_name = detento_first_name.capitalize()
             
-            # CHAVES CORRIGIDAS: Agora usa 'pronome' e 'artigo_definido'
             gender_parts = get_gender_parts(detento_first_name) 
             pronome = gender_parts['pronome']
-            artigo_definido = gender_parts['artigo_definido'] 
+            artigo_definido = gender_parts['article'] 
 
-        # --- TEMPLATE DE MENSAGEM FINAL (COM ARTIGO DEFINIDO CORRIGIDO) ---
+        # --- TEMPLATE DE MENSAGEM FINAL (COM ARTIGO DEFINIDO E CREDIBILIDADE) ---
         message = (
-            f"Olá {client_first_name}! Aqui é o Victor da *Jumbo CDP!* \n"
+            f"Olá {client_first_name}! Aqui é o Victor, consultor da Jumbo CDP! \n"
             f"Tenho uma ótima notícia para você.\n\n"
-            f"Notamos que o seu último jumbo para {artigo_definido} {detento_first_name} foi em {last_order_date} — {pronome} pode estar a precisar de alguns produtos!\n\n"
-            f"Para celebrar a sua próxima compra, consegui garantir um *BRINDE EXCLUSIVO* para incluir no pedido d{artigo_definido} {detento_first_name}.\n\n"
-            f"Posso te contar rapidinho qual é a surpresa? É só me avisar!"
+            f"Percebemos que o seu último jumbo para {artigo_definido} {detento_first_name} foi em {last_order_date}. {pronome.capitalize()} pode estar a precisar de alguns produtos! \n\n"
+            f"E para tornar a sua próxima compra ainda melhor, consegui garantir um *BRINDE EXCLUSIVO* para incluir no pedido d{artigo_definido} {detento_first_name}.\n\n"
+            f"Quer que eu te conte rapidinho qual é a surpresa? É só me avisar!"
         )
         # ----------------------------------
         
@@ -208,7 +205,10 @@ if uploaded_file is not None:
         st.success(f"Arquivo '{uploaded_file.name}' carregado com sucesso!")
         
     except Exception as e:
-        st.error(f"Erro ao ler o arquivo. Erro: {e}")
+        if 'openpyxl' in str(e):
+             st.error("Erro ao ler o arquivo Excel (.xlsx). Certifique-se de que a biblioteca 'openpyxl' está instalada no ambiente de execução do seu aplicativo (via requirements.txt).")
+        else:
+            st.error(f"Erro ao ler o arquivo. Erro: {e}")
         st.stop()
 
 
